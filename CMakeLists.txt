@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
 project(Kalman CXX)
 
+# Check that the compoiler has c++11 support
+# Crash otherwise.
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has C++11 support.")
+else()
+  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} "
+    "has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 # TODO: Use VERSION argument to project command after raising the minimum
 # cmake version to 3.0
 set(PROJECT_VERSION_MAJOR 0)
@@ -9,8 +20,6 @@ set(PROJECT_VERSION_PATCH 0)
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 
 include(CTest)
-
-set(KALMAN_CXX_FLAGS "-std=c++11")
 
 option(KALMAN_BUILD_EXAMPLES "Build the Kalman examples" ON)
 
@@ -51,13 +60,17 @@ include_directories(
     ${Eigen3_INCLUDE_DIR}
 )
 
-# Flags
-set(CMAKE_CXX_FLAGS "${KALMAN_CXX_FLAGS} -Wall -pedantic -g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DEIGEN_NO_DEBUG")
-
 # Examples
 if(KALMAN_BUILD_EXAMPLES)
   add_executable(example_robot1 "examples/Robot1/main.cpp")
+  # Set required C++11 flag
+  if(CMAKE_VERSION VERSION_LESS "3.1")
+    set_target_properties(example_robot1 PROPERTIES COMPILE_FLAGS "-std=c++11")
+  else()
+    set_property(TARGET example_robot1 PROPERTY CXX_STANDARD 11)
+    set_property(TARGET example_robot1 PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET example_robot1 PROPERTY CXX_EXTENSIONS OFF)
+  endif()
 endif()
 
 # Unit Tests
@@ -83,6 +96,15 @@ if(BUILD_TESTING)
   add_executable(kalman_test ${TESTS} ${HEADERS})
   target_link_libraries(kalman_test PRIVATE gtest gtest_main)
   add_test(Kalman kalman_test)
+
+  # Set required C++11 flag
+  if(CMAKE_VERSION VERSION_LESS "3.1")
+    set_target_properties(kalman_test PROPERTIES COMPILE_FLAGS "-std=c++11")
+  else()
+    set_property(TARGET kalman_test PROPERTY CXX_STANDARD 11)
+    set_property(TARGET kalman_test PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET kalman_test PROPERTY CXX_EXTENSIONS OFF)
+  endif()
 endif()
 
 #
