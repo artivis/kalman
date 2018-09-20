@@ -71,6 +71,8 @@ namespace Kalman {
         using KalmanBase::x;
         //! State Covariance Matrix
         using StandardBase::P;
+
+        using KalmanBase::getState;
         
     public:
         /**
@@ -116,7 +118,7 @@ namespace Kalman {
             P  = ( s.F * P * s.F.transpose() ) + ( s.W * s.getCovariance() * s.W.transpose() );
             
             // return state prediction
-            return this->getState();
+            return getState();
         }
         
         /**
@@ -146,7 +148,7 @@ namespace Kalman {
             P -= K * m.H * P;
             
             // return updated state estimate
-            return this->getState();
+            return getState();
         }
     };
 }

@@ -34,15 +34,27 @@ namespace Kalman
      */
     template<typename T, int N>
     using SquareMatrix = Matrix<T, N, N>;
-    
+
+    template<class Type>
+    struct MatrixTrait
+    {
+      using SquareStateSizeMatrix = SquareMatrix<typename Type::Scalar, Type::RowsAtCompileTime>;
+    };
+
+    template<class Type>
+    struct CovarianceTrait
+    {
+      using Covariance = SquareMatrix<typename Type::Scalar, Type::RowsAtCompileTime>;
+    };
+
     /**
      * @class Kalman::Covariance
      * @brief Template type for covariance matrices
      * @param Type The vector type for which to generate a covariance (usually a state or measurement type)
      */
     template<class Type>
-    using Covariance = SquareMatrix<typename Type::Scalar, Type::RowsAtCompileTime>;
-    
+    using Covariance = typename CovarianceTrait<Type>::Covariance;
+
     /**
      * @class Kalman::CovarianceSquareRoot
      * @brief Template type for covariance square roots
@@ -50,7 +62,15 @@ namespace Kalman
      */
     template<class Type>
     using CovarianceSquareRoot = Cholesky< Covariance<Type> >;
-    
+
+    template<class State, class Measurement>
+    struct KalmanGainTrait
+    {
+      using KalmanGain = Matrix<typename State::Scalar,
+                                State::RowsAtCompileTime,
+                                Measurement::RowsAtCompileTime>;
+    };
+
     /**
      * @class Kalman::KalmanGain
      * @brief Template type of Kalman Gain
@@ -58,18 +78,36 @@ namespace Kalman
      * @param Measurement The measurement type
      */
     template<class State, class Measurement>
-    using KalmanGain = Matrix<typename State::Scalar,
-                              State::RowsAtCompileTime,
-                              Measurement::RowsAtCompileTime>;
-    
+    using KalmanGain = typename KalmanGainTrait<State, Measurement>::KalmanGain;
+
+    template<class State>
+    struct UpdateTrait
+    {
+      using Update = Matrix<typename State::Scalar,
+                            State::RowsAtCompileTime, 1>;
+    };
+
+    /**
+     * @class Kalman::Update
+     * @brief The Kalman update
+     */
+    template<class State>
+    using Update = typename UpdateTrait<State>::Update;
+
+    template<class A, class B>
+    struct JacobianTrait
+    {
+      using Jacobian = Matrix<typename A::Scalar,
+                              A::RowsAtCompileTime,
+                              B::RowsAtCompileTime>;
+    };
+
     /**
      * @class Kalman::Jacobian
      * @brief Template type of jacobian of A w.r.t. B
      */
     template<class A, class B>
-    using Jacobian = Matrix<typename A::Scalar,
-                            A::RowsAtCompileTime,
-                            B::RowsAtCompileTime>;
+    using Jacobian = typename JacobianTrait<A,B>::Jacobian;
 }
 
 #endif

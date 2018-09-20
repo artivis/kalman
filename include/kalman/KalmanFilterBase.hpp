@@ -36,9 +36,9 @@ namespace Kalman {
     class KalmanFilterBase
     {
     public:
-        static_assert(/*StateType::RowsAtCompileTime == Dynamic ||*/StateType::RowsAtCompileTime > 0,
-                      "State vector must contain at least 1 element" /* or be dynamic */);
-        static_assert(StateType::ColsAtCompileTime == 1, "State type must be a column vector");
+        //static_assert(/*StateType::RowsAtCompileTime == Dynamic ||*/StateType::RowsAtCompileTime > 0,
+        //              "State vector must contain at least 1 element" /* or be dynamic */);
+        //static_assert(StateType::ColsAtCompileTime == 1, "State type must be a column vector");
 
         //! Numeric scalar type
         typedef typename StateType::Scalar T;
@@ -71,9 +71,7 @@ namespace Kalman {
         /**
          * @brief Protected constructor
          */
-        KalmanFilterBase()
-        {
-        }
+        KalmanFilterBase() = default;
     };
 }
 
