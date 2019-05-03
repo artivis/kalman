@@ -57,19 +57,29 @@ set(HEADERS
 
 include_directories(
     "include"
+)
+
+include_directories(SYSTEM
     ${Eigen3_INCLUDE_DIR}
 )
 
 # Examples
 if(KALMAN_BUILD_EXAMPLES)
-  add_executable(example_robot1 "examples/Robot1/main.cpp")
+#  add_executable(example_robot1 "examples/Robot1/main.cpp")
+  add_executable(example_custom_robot1 "examples/CustomRobot1/main.cpp")
+
+  set(TARGET_EXAMPLES_CPP11
+#    example_robot1
+    example_custom_robot1
+  )
+
   # Set required C++11 flag
   if(CMAKE_VERSION VERSION_LESS "3.1")
-    set_target_properties(example_robot1 PROPERTIES COMPILE_FLAGS "-std=c++11")
+    set_target_properties(${TARGET_EXAMPLES_CPP11} PROPERTIES COMPILE_FLAGS "-std=c++11")
   else()
-    set_property(TARGET example_robot1 PROPERTY CXX_STANDARD 11)
-    set_property(TARGET example_robot1 PROPERTY CXX_STANDARD_REQUIRED ON)
-    set_property(TARGET example_robot1 PROPERTY CXX_EXTENSIONS OFF)
+    set_property(TARGET ${TARGET_EXAMPLES_CPP11} PROPERTY CXX_STANDARD 11)
+    set_property(TARGET ${TARGET_EXAMPLES_CPP11} PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${TARGET_EXAMPLES_CPP11} PROPERTY CXX_EXTENSIONS OFF)
   endif()
 endif()
 
