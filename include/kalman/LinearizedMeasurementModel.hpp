@@ -72,7 +72,7 @@ namespace Kalman {
             H.setIdentity();
             V.setIdentity();
         }
-        ~LinearizedMeasurementModel() {}
+        ~LinearizedMeasurementModel() = default;
     };
 }
 

@@ -38,7 +38,7 @@ namespace Kalman {
     template<class StateType, class ControlType = Vector<typename StateType::Scalar, 0>, template<class> class CovarianceBase = StandardBase>
     class SystemModel : public CovarianceBase<StateType>
     {
-        static_assert(/*StateType::RowsAtCompileTime == Dynamic ||*/ StateType::RowsAtCompileTime > 0,
+        static_assert(/*StateType::RowsAtCompileTime == Dynamic ||*/ internal::traits<StateType>::Size > 0,
                       "State vector must contain at least 1 element" /* or be dynamic */);
         static_assert(/*ControlType::RowsAtCompileTime == Dynamic ||*/ ControlType::RowsAtCompileTime >= 0,
                       "Control vector must contain at least 0 elements" /* or be dynamic */);
@@ -61,8 +61,8 @@ namespace Kalman {
         virtual State f(const State& x, const Control& u) const = 0;
         
     protected:
-        SystemModel() {}
-        virtual ~SystemModel() {}
+        SystemModel() = default;
+        virtual ~SystemModel() = default;
     };
 }
 

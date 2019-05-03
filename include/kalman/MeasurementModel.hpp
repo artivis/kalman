@@ -37,11 +37,11 @@ namespace Kalman {
     template<class StateType, class MeasurementType, template<class> class CovarianceBase = StandardBase>
     class MeasurementModel : public CovarianceBase<MeasurementType>
     {
-        static_assert(/*StateType::RowsAtCompileTime == Dynamic ||*/StateType::RowsAtCompileTime > 0,
+        static_assert(/*StateType::RowsAtCompileTime == Dynamic ||*/internal::traits<StateType>::Size > 0,
                       "State vector must contain at least 1 element" /* or be dynamic */);
         static_assert(/*MeasurementType::RowsAtCompileTime == Dynamic ||*/MeasurementType::RowsAtCompileTime > 0,
                       "Measurement vector must contain at least 1 element" /* or be dynamic */);
-        static_assert(std::is_same<typename StateType::Scalar, typename MeasurementType::Scalar>::value,
+        static_assert(std::is_same<typename internal::traits<StateType>::Scalar, typename MeasurementType::Scalar>::value,
                        "State and Measurement scalar types must be identical");
     public:
         //! System state type
@@ -59,8 +59,8 @@ namespace Kalman {
         virtual Measurement h(const State& x) const = 0;
         
     protected:
-        MeasurementModel() {}
-        virtual ~MeasurementModel() {}
+        MeasurementModel() = default;
+        virtual ~MeasurementModel() = default;
     };
 }
 
