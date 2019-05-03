@@ -26,6 +26,23 @@
 
 namespace Kalman
 {
+namespace internal
+{
+
+    /**
+     * @class Kalman::internal::traits
+     * @brief
+     */
+    template<typename T>
+    struct traits
+    {
+      using Scalar = typename T::Scalar;
+      static constexpr auto Size = T::RowsAtCompileTime;
+    };
+
+}
+
+
     /**
      * @class Kalman::SquareMatrix
      * @brief Template type representing a square matrix
@@ -34,15 +51,15 @@ namespace Kalman
      */
     template<typename T, int N>
     using SquareMatrix = Matrix<T, N, N>;
-    
+
     /**
      * @class Kalman::Covariance
      * @brief Template type for covariance matrices
      * @param Type The vector type for which to generate a covariance (usually a state or measurement type)
      */
     template<class Type>
-    using Covariance = SquareMatrix<typename Type::Scalar, Type::RowsAtCompileTime>;
-    
+    using Covariance = SquareMatrix<typename internal::traits<Type>::Scalar, internal::traits<Type>::Size>;
+
     /**
      * @class Kalman::CovarianceSquareRoot
      * @brief Template type for covariance square roots
@@ -50,7 +67,7 @@ namespace Kalman
      */
     template<class Type>
     using CovarianceSquareRoot = Cholesky< Covariance<Type> >;
-    
+
     /**
      * @class Kalman::KalmanGain
      * @brief Template type of Kalman Gain
@@ -58,18 +75,19 @@ namespace Kalman
      * @param Measurement The measurement type
      */
     template<class State, class Measurement>
-    using KalmanGain = Matrix<typename State::Scalar,
-                              State::RowsAtCompileTime,
+    using KalmanGain = Matrix<typename internal::traits<State>::Scalar,
+                              internal::traits<State>::Size,
                               Measurement::RowsAtCompileTime>;
-    
+
     /**
      * @class Kalman::Jacobian
      * @brief Template type of jacobian of A w.r.t. B
      */
     template<class A, class B>
-    using Jacobian = Matrix<typename A::Scalar,
-                            A::RowsAtCompileTime,
-                            B::RowsAtCompileTime>;
+    using Jacobian = Matrix<typename internal::traits<A>::Scalar,
+                            internal::traits<A>::Size,
+                            internal::traits<B>::Size>;
+
 }
 
 #endif

@@ -35,9 +35,9 @@ namespace Kalman {
     class StandardBase
     {
     protected:
-        //! Covariance
-        Covariance<StateType> P;
-        
+        //! State Covariance
+        Covariance<StateType> P = Covariance<StateType>::Identity();
+
     public:
         /**
          * Get covariance
@@ -78,12 +78,10 @@ namespace Kalman {
             return true;
         }
 
-        
     protected:
-        StandardBase()
-        {
-            P.setIdentity();
-        }
+
+        StandardBase() = default;
+        ~StandardBase() = default;
     };
 }
 

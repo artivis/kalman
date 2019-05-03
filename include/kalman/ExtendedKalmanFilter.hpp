@@ -48,7 +48,7 @@ namespace Kalman {
         typedef StandardFilterBase<StateType> StandardBase;
         
         //! Numeric Scalar Type inherited from base
-        using typename KalmanBase::T;
+        using typename KalmanBase::Scalar;
         
         //! State Type inherited from base
         using typename KalmanBase::State;
@@ -71,16 +71,16 @@ namespace Kalman {
         using KalmanBase::x;
         //! State Covariance Matrix
         using StandardBase::P;
+
+        using KalmanBase::getState;
         
     public:
         /**
          * @brief Constructor
          */
-        ExtendedKalmanFilter()
-        {
-            // Setup state and covariance
-            P.setIdentity();
-        }
+        ExtendedKalmanFilter() = default;
+        ~ExtendedKalmanFilter() = default;
+
         
         /**
          * @brief Perform filter prediction step using system model and no control input (i.e. \f$ u = 0 \f$)
@@ -113,10 +113,10 @@ namespace Kalman {
             x = s.f(x, u);
             
             // predict covariance
-            P  = ( s.F * P * s.F.transpose() ) + ( s.W * s.getCovariance() * s.W.transpose() );
+            P = ( s.F * P * s.F.transpose() ) + ( s.W * s.getCovariance() * s.W.transpose() );
             
             // return state prediction
-            return this->getState();
+            return getState();
         }
         
         /**
@@ -146,7 +146,7 @@ namespace Kalman {
             P -= K * m.H * P;
             
             // return updated state estimate
-            return this->getState();
+            return getState();
         }
     };
 }
