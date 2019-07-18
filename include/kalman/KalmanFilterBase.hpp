@@ -35,6 +35,9 @@ namespace Kalman {
     template<class StateType>
     class KalmanFilterBase
     {
+      static_assert(std::is_default_constructible<StateType>::value,
+                    "StateType must be default constructible !");
+
     public:
 
         //! Type of the state vector
@@ -72,6 +75,8 @@ namespace Kalman {
         KalmanFilterBase() = default;
         ~KalmanFilterBase() = default;
 
+//        template <typename... Args>
+//        KalmanFilterBase(Args&&... args) : x(std::forward<Args>(args)...) {}
     };
 }
 

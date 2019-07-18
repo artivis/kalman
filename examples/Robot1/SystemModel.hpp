@@ -81,7 +81,7 @@ class SystemModel : public Kalman::LinearizedSystemModel<State<T>, Control<T>, C
 {
 public:
     //! State type shortcut definition
-	typedef KalmanExamples::Robot1::State<T> S;
+    typedef KalmanExamples::Robot1::State<T> S;
     
     //! Control type shortcut definition
     typedef KalmanExamples::Robot1::Control<T> C;

@@ -57,17 +57,18 @@ public:
     State() = default;
     ~State() = default;
 
-    State(const Tangent& t)
-    {
-      setZero();
-      this->operator +=(t);
-    }
+    // State(const Tangent& t)
+    // {
+    //   setZero();
+    //   this->operator +=(t);
+    // }
 
+    // Optional, useful
     T x()     const { return x_; }
     T y()     const { return y_; }
     T theta() const { return std::arg(theta_); }
 
-    // Not mandatory
+    // Optional, useful
     void setZero()
     {
       x_     = 0;
@@ -76,7 +77,7 @@ public:
       theta_.imag(0);
     }
 
-    // Mandatory
+    // Necessary
     State<T>& operator += (const Tangent& v)
     {
       x_ += v(0);
@@ -85,12 +86,12 @@ public:
       return *this;
     }
 
-    Tangent Log() const
-    {
-      return Tangent(x_, y_, theta());
-    }
+    // Tangent Log() const
+    // {
+    //   return Tangent(x_, y_, theta());
+    // }
 
-    // Mandatory
+    // Necessary
     State<T> operator + (const Tangent& v) const
     {
       State<T> ret(*this);
@@ -125,15 +126,15 @@ class Control : public Kalman::Vector<T, 2>
 {
 public:
     KALMAN_VECTOR(Control, T, 2)
-    
+
     //! Velocity
     static constexpr size_t V = 0;
     //! Angular Rate (Orientation-change)
     static constexpr size_t DTHETA = 1;
-    
+
     T v()       const { return (*this)[ V ]; }
     T dtheta()  const { return (*this)[ DTHETA ]; }
-    
+
     T& v()      { return (*this)[ V ]; }
     T& dtheta() { return (*this)[ DTHETA ]; }
 };
@@ -141,7 +142,7 @@ public:
 /**
  * @brief System model for a simple planar 3DOF robot
  *
- * This is the system model defining how our robot moves from one 
+ * This is the system model defining how our robot moves from one
  * time-step to the next, i.e. how the system state evolves over time.
  *
  * @param T Numeric scalar type
@@ -155,15 +156,15 @@ class SystemModel : public Kalman::LinearizedSystemModel<State<T>, Control<T>, C
 public:
     //! State type shortcut definition
     typedef KalmanExamples::CustomRobot1::State<T> S;
-    
+
     //! Control type shortcut definition
     typedef KalmanExamples::CustomRobot1::Control<T> C;
-    
+
     /**
      * @brief Definition of (non-linear) state transition function
      *
      * This function defines how the system state is propagated through time,
-     * i.e. it defines in which state \f$\hat{x}_{k+1}\f$ is system is expected to 
+     * i.e. it defines in which state \f$\hat{x}_{k+1}\f$ is system is expected to
      * be in time-step \f$k+1\f$ given the current state \f$x_k\f$ in step \f$k\f$ and
      * the system control input \f$u\f$.
      *
@@ -172,11 +173,11 @@ public:
      * @returns The (predicted) system state in the next time-step
      */
     S f(const S& x, const C& u) const
-    {       
+    {
         // New orientation given by old orientation plus orientation change
         T newOrientation = x.theta() + u.dtheta();
         // Re-scale orientation to [-pi/2 to +pi/2]
-        
+
         // Return transitioned state vector
         //
         // New x-position given by old x-position plus change in x-direction
@@ -186,7 +187,7 @@ public:
                                        std::sin( newOrientation ) * u.v(),
                                        u.dtheta());
     }
-    
+
 protected:
     /**
      * @brief Update jacobian matrices for the system state transition function using current state
@@ -207,24 +208,24 @@ protected:
     {
         // F = df/dx (Jacobian of state transition w.r.t. the state)
         this->F.setZero();
-        
+
         // partial derivative of x.x() w.r.t. x.x()
         this->F( 0, 0 ) = 1;
         // partial derivative of x.x() w.r.t. x.theta()
         this->F( 0, 2 ) = -std::sin( x.theta() + u.dtheta() ) * u.v();
-        
+
         // partial derivative of x.y() w.r.t. x.y()
         this->F( 1, 1 ) = 1;
         // partial derivative of x.y() w.r.t. x.theta()
         this->F( 1, 2 ) = std::cos( x.theta() + u.dtheta() ) * u.v();
-        
+
         // partial derivative of x.theta() w.r.t. x.theta()
         this->F( 2, 2 ) = 1;
-        
+
         // W = df/dw (Jacobian of state transition w.r.t. the noise)
         this->W.setIdentity();
         // TODO: more sophisticated noise modelling
-        //       i.e. The noise affects the the direction in which we move as 
+        //       i.e. The noise affects the the direction in which we move as
         //       well as the velocity (i.e. the distance we move)
     }
 };

@@ -99,23 +99,23 @@ set(TESTS
     test/Matrix.cpp
 )
 
-if(BUILD_TESTING)
-  enable_testing()
-  add_subdirectory("external/googletest")
-  include_directories("external/googletest/include")
-  add_executable(kalman_test ${TESTS} ${HEADERS})
-  target_link_libraries(kalman_test PRIVATE gtest gtest_main)
-  add_test(Kalman kalman_test)
+#if(BUILD_TESTING)
+#  enable_testing()
+#  add_subdirectory("external/googletest")
+#  include_directories("external/googletest/include")
+#  add_executable(kalman_test ${TESTS} ${HEADERS})
+#  target_link_libraries(kalman_test PRIVATE gtest gtest_main)
+#  add_test(Kalman kalman_test)
 
-  # Set required C++11 flag
-  if(CMAKE_VERSION VERSION_LESS "3.1")
-    set_target_properties(kalman_test PROPERTIES COMPILE_FLAGS "-std=c++11")
-  else()
-    set_property(TARGET kalman_test PROPERTY CXX_STANDARD 11)
-    set_property(TARGET kalman_test PROPERTY CXX_STANDARD_REQUIRED ON)
-    set_property(TARGET kalman_test PROPERTY CXX_EXTENSIONS OFF)
-  endif()
-endif()
+#  # Set required C++11 flag
+#  if(CMAKE_VERSION VERSION_LESS "3.1")
+#    set_target_properties(kalman_test PROPERTIES COMPILE_FLAGS "-std=c++11")
+#  else()
+#    set_property(TARGET kalman_test PROPERTY CXX_STANDARD 11)
+#    set_property(TARGET kalman_test PROPERTY CXX_STANDARD_REQUIRED ON)
+#    set_property(TARGET kalman_test PROPERTY CXX_EXTENSIONS OFF)
+#  endif()
+#endif()
 
 #
 # Install/Uninstall support

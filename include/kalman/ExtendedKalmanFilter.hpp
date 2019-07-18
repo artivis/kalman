@@ -81,6 +81,8 @@ namespace Kalman {
         ExtendedKalmanFilter() = default;
         ~ExtendedKalmanFilter() = default;
 
+//      template <typename... Args>
+//      ExtendedKalmanFilter(Args&&... args) : KalmanBase(std::forward<Args>(args)...) {}
         
         /**
          * @brief Perform filter prediction step using system model and no control input (i.e. \f$ u = 0 \f$)

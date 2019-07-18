@@ -88,6 +88,71 @@ namespace internal
                             internal::traits<A>::Size,
                             internal::traits<B>::Size>;
 
+    template <typename T, int N, int RC>
+    bool isSymmetric(const Eigen::Matrix<T, N, N, RC>& M,
+                     const T eps = 1e-8)
+    {
+      return M.isApprox(M.transpose(), eps);
+    }
+
+    template <typename T, int N, int RC>
+    bool isPositiveSemiDefinite(const Eigen::Matrix<T, N, N, RC>& M,
+                                const T eps = 1e-8)
+    {
+      Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, N, N, RC> > eigensolver(M);
+
+      if (eigensolver.info() == Eigen::Success)
+      {
+        // All eigenvalues must be >= 0:
+        return (eigensolver.eigenvalues().array() >= eps).all();
+      }
+
+      return false;
+    }
+
+    template <typename T, int N, int RC>
+    bool isCovariance(const Eigen::Matrix<T, N, N, RC>& M,
+                      const T eps = 1e-8)
+    {
+      return isSymmetric(M) && isPositiveSemiDefinite(M, eps);
+    }
+
+    template <typename T, int N, int RC>
+    bool makePosDef(Eigen::Matrix<T,N,N,RC>& M, const T eps = 1e-8)
+    {
+        Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T,N,N,RC> > eigensolver(M);
+
+        if (eigensolver.info() == Eigen::Success)
+        {
+            // All eigenvalues must be >= 0:
+            T epsilon = eps;
+            while ((eigensolver.eigenvalues().array() < eps).any())
+            {
+                //std::cout << "----- any negative eigenvalue or too close to zero\n";
+                //std::cout << "previous eigenvalues: " << eigensolver.eigenvalues().transpose() << std::endl;
+                //std::cout << "previous determinant: " << M.determinant() << std::endl;
+                M = eigensolver.eigenvectors() *
+                    eigensolver.eigenvalues().cwiseMax(epsilon).asDiagonal() *
+                    eigensolver.eigenvectors().transpose();
+                eigensolver.compute(M);
+                //std::cout << "epsilon used: " << epsilon << std::endl;
+                //std::cout << "posterior eigenvalues: " << eigensolver.eigenvalues().transpose() << std::endl;
+                //std::cout << "posterior determinant: " << M.determinant() << std::endl;
+                epsilon *= 10;
+            }
+
+            if (!isCovariance(M))
+              throw std::runtime_error("Matrix is not a covariance!");
+
+            return epsilon != eps;
+        }
+        else
+            throw std::runtime_error("SelfAdjointEigenSolver failed!");
+
+        return false;
+    }
+
+
 }
 
 #endif
